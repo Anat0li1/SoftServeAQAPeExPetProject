@@ -22,3 +22,5 @@ total_items = driver.find_elements(By.CSS_SELECTOR, "li[data-testid='product-car
 assert len(total_items) == EXPECTED_COUNT, f"Expected {EXPECTED_COUNT} items, got {len(total_items)}"
 showing_text = driver.find_element(By.XPATH, "//p[@data-testid='product-count']").text
 assert showing_text == f"Showing {EXPECTED_COUNT} of {EXPECTED_COUNT} products", f""
+
+driver.quit()
