@@ -41,109 +41,111 @@ def retrieve_price(style, price):
         case _:
             return float(price)
 
-chrome_options = Options()
 
-prefs = {
-    "credentials_enable_service": False,
-    "profile.password_manager_enabled": False,
-    "profile.password_manager_leak_detection": False,
-}
-chrome_options.add_experimental_option("prefs", prefs)
+def test_successful_product_buying():
+    chrome_options = Options()
 
-chrome_options.add_argument(
-    "--disable-features=PasswordLeakDetection,PasswordManagerLeakDetection,AutofillServerCommunication"
-)
-chrome_options.add_argument("--disable-save-password-bubble")
+    prefs = {
+        "credentials_enable_service": False,
+        "profile.password_manager_enabled": False,
+        "profile.password_manager_leak_detection": False,
+    }
+    chrome_options.add_experimental_option("prefs", prefs)
 
-driver = webdriver.Chrome(options=chrome_options)
+    chrome_options.add_argument(
+        "--disable-features=PasswordLeakDetection,PasswordManagerLeakDetection,AutofillServerCommunication"
+    )
+    chrome_options.add_argument("--disable-save-password-bubble")
 
-try:
-    driver.get("https://www.practiceqaautomation.com/shop")
-    assert "Nova Shop: E-commerce Practice App" in driver.title
-    driver.maximize_window()
-    driver.find_element(By.ID, "username").send_keys(TEST_USERNAME)
-    driver.find_element(By.ID, "password").send_keys(TEST_PASSWORD)
-    driver.find_element(By.CSS_SELECTOR, "button[data-testid='login-button'], button[type='submit']").click()
+    driver = webdriver.Chrome(options=chrome_options)
 
-    time.sleep(2)
+    try:
+        driver.get("https://www.practiceqaautomation.com/shop")
+        assert "Nova Shop: E-commerce Practice App" in driver.title
+        driver.maximize_window()
+        driver.find_element(By.ID, "username").send_keys(TEST_USERNAME)
+        driver.find_element(By.ID, "password").send_keys(TEST_PASSWORD)
+        driver.find_element(By.CSS_SELECTOR, "button[data-testid='login-button'], button[type='submit']").click()
 
-    #driver.find_element(By.CSS_SELECTOR, "li[data-product-id='p1']")
-    product_item = driver.find_element(By.XPATH, f"//a[text()='{NEEDED_PRODUCT}']/../..")
-    product_button = driver.find_element(By.XPATH, f"//a[text()='{NEEDED_PRODUCT}']/../..//button")
-    #product_button = product_item.find_element(By.XPATH, "//button")
-    assert product_button.text == BUTTON_TITLE, f"Expected '{BUTTON_TITLE}' but got '{product_button.text}"
-    product_button.click()
-    assert product_button.text == UPDATED_BUTTON_TITLE, f"Expected '{UPDATED_BUTTON_TITLE}' but got '{product_button.text}"
-    product_price = product_item.find_element(By.XPATH, "//span[@data-testid='product-price']").text
+        time.sleep(2)
 
-    cart_link_button = driver.find_element(By.CSS_SELECTOR, "a[data-testid='cart-link']")
-    cart_link_button.click()
-    time.sleep(2)
+        #driver.find_element(By.CSS_SELECTOR, "li[data-product-id='p1']")
+        product_item = driver.find_element(By.XPATH, f"//a[text()='{NEEDED_PRODUCT}']/../..")
+        product_button = driver.find_element(By.XPATH, f"//a[text()='{NEEDED_PRODUCT}']/../..//button")
+        #product_button = product_item.find_element(By.XPATH, "//button")
+        assert product_button.text == BUTTON_TITLE, f"Expected '{BUTTON_TITLE}' but got '{product_button.text}"
+        product_button.click()
+        assert product_button.text == UPDATED_BUTTON_TITLE, f"Expected '{UPDATED_BUTTON_TITLE}' but got '{product_button.text}"
+        product_price = product_item.find_element(By.XPATH, "//span[@data-testid='product-price']").text
 
-    cart_item = driver.find_elements(By.XPATH, "//li[@data-testid='cart-item']")[0]
-    cart_item_prices = driver.find_elements(By.XPATH, "//div[contains(text(), '$')]")
-    for cart_item_price in cart_item_prices:
-        assert product_price in cart_item_price.text, f"Expected '{product_price}' but got '{cart_item_price.text}"
+        cart_link_button = driver.find_element(By.CSS_SELECTOR, "a[data-testid='cart-link']")
+        cart_link_button.click()
+        time.sleep(2)
 
-    order_summary_panel = driver.find_element(By.TAG_NAME, "aside")
-    prices_box = order_summary_panel.find_element(By.TAG_NAME, "dl")
-    subtotal_price = prices_box.find_element(By.XPATH, "//dt[text()='Subtotal']/following-sibling::dd").text
-    assert product_price == subtotal_price, f"Expected '{subtotal_price}' but got '{product_price}'"
-    shipping_price = prices_box.find_element(By.XPATH, "//dt[text()='Shipping']/following-sibling::dd").text
-    general_price = retrieve_price(PRICE_STYLE, subtotal_price)
-    if "Free" not in shipping_price.strip():
-        general_price += retrieve_price(PRICE_STYLE, shipping_price)
+        cart_item = driver.find_elements(By.XPATH, "//li[@data-testid='cart-item']")[0]
+        cart_item_prices = driver.find_elements(By.XPATH, "//div[contains(text(), '$')]")
+        for cart_item_price in cart_item_prices:
+            assert product_price in cart_item_price.text, f"Expected '{product_price}' but got '{cart_item_price.text}"
 
-    total_price = prices_box.find_element(By.XPATH, "//dt[text()='Total']/following-sibling::dd").text
-    expectedCost = round(general_price * (1 + FIXED_TAX), 2)
-    actualCost = retrieve_price(PRICE_STYLE, total_price)
-    assert actualCost == expectedCost, f"Expected '{expectedCost}' but got '{actualCost}'"
+        order_summary_panel = driver.find_element(By.TAG_NAME, "aside")
+        prices_box = order_summary_panel.find_element(By.TAG_NAME, "dl")
+        subtotal_price = prices_box.find_element(By.XPATH, "//dt[text()='Subtotal']/following-sibling::dd").text
+        assert product_price == subtotal_price, f"Expected '{subtotal_price}' but got '{product_price}'"
+        shipping_price = prices_box.find_element(By.XPATH, "//dt[text()='Shipping']/following-sibling::dd").text
+        general_price = retrieve_price(PRICE_STYLE, subtotal_price)
+        if "Free" not in shipping_price.strip():
+            general_price += retrieve_price(PRICE_STYLE, shipping_price)
 
-    checkout_button = order_summary_panel.find_element(By.XPATH, "//a[@data-testid='checkout-button']")
-    checkout_button.click()
-    time.sleep(2)
+        total_price = prices_box.find_element(By.XPATH, "//dt[text()='Total']/following-sibling::dd").text
+        expectedCost = round(general_price * (1 + FIXED_TAX), 2)
+        actualCost = retrieve_price(PRICE_STYLE, total_price)
+        assert actualCost == expectedCost, f"Expected '{expectedCost}' but got '{actualCost}'"
 
-    contact_and_shipping_panel = driver.find_element(By.XPATH, "//h2[contains(text(), 'Contact')]/..")
-    contact_and_shipping_panel.find_element(By.ID, "first-name").send_keys(FIRST_NAME)
-    contact_and_shipping_panel.find_element(By.ID, "last-name").send_keys(LAST_NAME)
-    contact_and_shipping_panel.find_element(By.ID, "email").send_keys(EMAIL)
-    contact_and_shipping_panel.find_element(By.ID, "phone").send_keys(PHONE)
-    contact_and_shipping_panel.find_element(By.ID, "address").send_keys(STREET_ADDRESS)
-    contact_and_shipping_panel.find_element(By.ID, "city").send_keys(CITY)
-    Select(contact_and_shipping_panel.find_element(By.ID, "state")).select_by_value(STATE)
-    contact_and_shipping_panel.find_element(By.ID, "zip").send_keys(ZIP_CODE)
+        checkout_button = order_summary_panel.find_element(By.XPATH, "//a[@data-testid='checkout-button']")
+        checkout_button.click()
+        time.sleep(2)
 
-    payment_panel = driver.find_element(By.XPATH, "//h2[contains(text(), 'Payment')]/..")
-    payment_panel.find_element(By.ID, "card-name").send_keys(CARD_NAME)
-    payment_panel.find_element(By.ID, "card-number").send_keys(CARD_NUMBER)
-    payment_panel.find_element(By.ID, "card-expiry").send_keys(EXPIRY)
-    payment_panel.find_element(By.ID, "card-cvv").send_keys(CVV)
+        contact_and_shipping_panel = driver.find_element(By.XPATH, "//h2[contains(text(), 'Contact')]/..")
+        contact_and_shipping_panel.find_element(By.ID, "first-name").send_keys(FIRST_NAME)
+        contact_and_shipping_panel.find_element(By.ID, "last-name").send_keys(LAST_NAME)
+        contact_and_shipping_panel.find_element(By.ID, "email").send_keys(EMAIL)
+        contact_and_shipping_panel.find_element(By.ID, "phone").send_keys(PHONE)
+        contact_and_shipping_panel.find_element(By.ID, "address").send_keys(STREET_ADDRESS)
+        contact_and_shipping_panel.find_element(By.ID, "city").send_keys(CITY)
+        Select(contact_and_shipping_panel.find_element(By.ID, "state")).select_by_value(STATE)
+        contact_and_shipping_panel.find_element(By.ID, "zip").send_keys(ZIP_CODE)
 
-    agree_terms_checkbox = driver.find_element(By.XPATH, "//input[@data-testid='accept-terms' or @type='checkbox']")
-    agree_terms_checkbox.click()
-    driver.find_element(By.XPATH, "//button[@data-testid='place-order' or @type='submit']").click()
+        payment_panel = driver.find_element(By.XPATH, "//h2[contains(text(), 'Payment')]/..")
+        payment_panel.find_element(By.ID, "card-name").send_keys(CARD_NAME)
+        payment_panel.find_element(By.ID, "card-number").send_keys(CARD_NUMBER)
+        payment_panel.find_element(By.ID, "card-expiry").send_keys(EXPIRY)
+        payment_panel.find_element(By.ID, "card-cvv").send_keys(CVV)
 
-    error_element = driver.find_elements(By.XPATH, "//div[@role='alert']")
-    assert len(error_element) == 0, "Expected no error elements"
+        agree_terms_checkbox = driver.find_element(By.XPATH, "//input[@data-testid='accept-terms' or @type='checkbox']")
+        agree_terms_checkbox.click()
+        driver.find_element(By.XPATH, "//button[@data-testid='place-order' or @type='submit']").click()
 
-    time.sleep(2)
-    successful_order_panel = driver.find_element(By.CSS_SELECTOR, "div[data-testid='order-success']")
-    actual_message = successful_order_panel.find_element(By.TAG_NAME, "h1").text
-    assert actual_message == EXPECTED_MESSAGE, f"Expected '{EXPECTED_MESSAGE}' but got '{actual_message}'"
-    order_id = successful_order_panel.find_element(By.CSS_SELECTOR, "p[data-testid='order-id']").text
-    assert order_id.startswith(ORDER_START), f"Expected order id starting with '{ORDER_START}' but got '{order_id}'"
-    assert order_id.strip(ORDER_START).isdecimal(), f"Expected sequence after {ORDER_START} to be numeric"
-    order_table = successful_order_panel.find_element(By.TAG_NAME, "dl")
-    order_items_count = order_table.find_element(By.CSS_SELECTOR, "dd[data-testid='order-items']").text
-    assert int(order_items_count) == EXPECTED_ITEMS, f"Expected '{EXPECTED_ITEMS}' but got '{order_items_count}'"
+        error_element = driver.find_elements(By.XPATH, "//div[@role='alert']")
+        assert len(error_element) == 0, "Expected no error elements"
 
-    order_item_delivery = successful_order_panel.find_elements(By.XPATH, f"//dt[text()='{DELIVERY_LABEL}']/following-sibling::dd")[0].text
-    assert order_item_delivery == DEFAULT_DELIVERY, f"Expected '{DEFAULT_DELIVERY}' but got '{order_item_delivery}'"
-    order_item_payment = successful_order_panel.find_elements(By.XPATH, f"//dt[text()='{PAYMENT_LABEL}']/following-sibling::dd")[0].text
-    assert order_item_payment == DEFAULT_PAYMENT_METHOD, f"Expected '{DEFAULT_PAYMENT_METHOD}' but got '{order_item_payment}'"
+        time.sleep(5)
+        successful_order_panel = driver.find_element(By.CSS_SELECTOR, "div[data-testid='order-success']")
+        actual_message = successful_order_panel.find_element(By.TAG_NAME, "h1").text
+        assert actual_message == EXPECTED_MESSAGE, f"Expected '{EXPECTED_MESSAGE}' but got '{actual_message}'"
+        order_id = successful_order_panel.find_element(By.CSS_SELECTOR, "p[data-testid='order-id']").text
+        assert order_id.startswith(ORDER_START), f"Expected order id starting with '{ORDER_START}' but got '{order_id}'"
+        assert order_id.strip(ORDER_START).isdecimal(), f"Expected sequence after {ORDER_START} to be numeric"
+        order_table = successful_order_panel.find_element(By.TAG_NAME, "dl")
+        order_items_count = order_table.find_element(By.CSS_SELECTOR, "dd[data-testid='order-items']").text
+        assert int(order_items_count) == EXPECTED_ITEMS, f"Expected '{EXPECTED_ITEMS}' but got '{order_items_count}'"
 
-    order_total = successful_order_panel.find_element(By.CSS_SELECTOR, "dd[data-testid='order-total']").text
-    assert retrieve_price(PRICE_STYLE, order_total) == expectedCost, f"Expected '{expectedCost}' but got '{order_total}'"
+        order_item_delivery = successful_order_panel.find_elements(By.XPATH, f"//dt[text()='{DELIVERY_LABEL}']/following-sibling::dd")[0].text
+        assert order_item_delivery == DEFAULT_DELIVERY, f"Expected '{DEFAULT_DELIVERY}' but got '{order_item_delivery}'"
+        order_item_payment = successful_order_panel.find_elements(By.XPATH, f"//dt[text()='{PAYMENT_LABEL}']/following-sibling::dd")[0].text
+        assert order_item_payment == DEFAULT_PAYMENT_METHOD, f"Expected '{DEFAULT_PAYMENT_METHOD}' but got '{order_item_payment}'"
 
-finally:
-    driver.quit()
+        order_total = successful_order_panel.find_element(By.CSS_SELECTOR, "dd[data-testid='order-total']").text
+        assert retrieve_price(PRICE_STYLE, order_total) == expectedCost, f"Expected '{expectedCost}' but got '{order_total}'"
+
+    finally:
+        driver.quit()
