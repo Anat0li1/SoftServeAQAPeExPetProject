@@ -9,12 +9,11 @@ EXPECTED_COUNT = 12
 EXPECTED_TITLE = "Nova Shop: E-commerce Practice App"
 EXPECTED_GREETING = f"Hi, {TEST_USERNAME}"
 EXPECTED_SHOWING_TEXT = f"Showing {EXPECTED_COUNT} of {EXPECTED_COUNT} products"
+BASE_URL = "https://www.practiceqaautomation.com/shop"
 
 
-def test_login_with_valid_credentials():
-    driver = webdriver.Chrome()
-    driver.get("https://www.practiceqaautomation.com/shop")
-    driver.maximize_window()
+def test_login_with_valid_credentials(driver):
+    driver.get(BASE_URL)
 
     login_page = LoginPage(driver)
     assert EXPECTED_TITLE in login_page.get_title(), f"Expected {EXPECTED_TITLE} in the page title"
