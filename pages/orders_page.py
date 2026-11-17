@@ -1,5 +1,5 @@
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as ec
 
 from pages.base_page import BasePage
 
@@ -19,7 +19,7 @@ class OrdersPage(BasePage):
 
     def get_table(self):
         return self.wait.until(
-            EC.visibility_of_element_located(self.ORDERS_TABLE)
+            ec.visibility_of_element_located(self.ORDERS_TABLE)
         )
 
     def get_order_rows(self):

@@ -1,10 +1,10 @@
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import Select
 
 from pages.base_page import BasePage
-from pages.element import Element
 from pages.components.product_item import ProductItem
+from pages.element import Element
 
 
 class ProductsPage(BasePage):
@@ -65,7 +65,7 @@ class ProductsPage(BasePage):
         )
 
         element = self.wait.until(
-            EC.visibility_of_element_located(locator)
+            ec.visibility_of_element_located(locator)
         )
 
         return ProductItem(self.driver, element)

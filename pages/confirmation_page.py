@@ -1,5 +1,5 @@
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as ec
 
 from pages.base_page import BasePage
 from pages.components.order_success import OrderSuccess
@@ -13,7 +13,7 @@ class ConfirmationPage(BasePage):
 
     def get_success_panel(self):
         element = self.wait.until(
-            EC.visibility_of_element_located(self.SUCCESS_PANEL)
+            ec.visibility_of_element_located(self.SUCCESS_PANEL)
         )
 
         return OrderSuccess(self.driver, element)
