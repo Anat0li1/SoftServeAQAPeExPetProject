@@ -9,7 +9,10 @@ class LoginPage(BasePage):
         super().__init__(driver)
         self.username_input_locator = (By.ID, "username")
         self.password_input_locator = (By.ID, "password")
-        self.login_button_locator = (By.CSS_SELECTOR, "button[data-testid='login-button'], button[type='submit']")
+        self.login_button_locator = (
+            By.CSS_SELECTOR,
+            "button[data-testid='login-button'], button[type='submit']"
+        )
 
     def login(self, username, password):
         self.type_text(self.username_input_locator, username)
