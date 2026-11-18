@@ -1,4 +1,5 @@
 from pages.login_page import LoginPage
+from utils.json_reader import JSONReader
 from utils.price_utils import PriceUtils
 
 TEST_USERNAME = 'demo_user'
@@ -11,24 +12,6 @@ UPDATED_BUTTON_TITLE = "Remove"
 
 PRICE_STYLE = "american"
 FIXED_TAX = 0.08
-
-contact_form_data = {
-    "first_name" : "Anna",
-    "last_name" : "Smith",
-    "email" : "anna@smith.com",
-    "phone" : "1231231233",
-    "city" : "New York",
-    "state" : "New York",
-    "address" : "Famous Street, 14",
-    "zip" : "12345",
-}
-
-payment_form_data = {
-    "card_name": "Main card",
-    "card_number": "4242 4242 4242 4242",
-    "expiry": "12/30",
-    "cvv": "123",
-}
 
 EXPECTED_MESSAGE = "Thank you for your order!"
 DEFAULT_PAYMENT_METHOD = "Card"
@@ -48,6 +31,7 @@ def test_successful_product_buying(driver):
 
     login_page = LoginPage(driver)
     price_utils = PriceUtils(PRICE_STYLE)
+    json_reader = JSONReader("./../test_data/order_data.json")
     products_page = login_page.login(TEST_USERNAME, TEST_PASSWORD)
 
     product = products_page.get_product(NEEDED_PRODUCT)
@@ -85,8 +69,9 @@ def test_successful_product_buying(driver):
         f"Expected '{expected_cost}' but got '{actual_cost}'"
 
     checkout_page = cart_page.open_checkout()
-    checkout_page.get_contact_form().fill(contact_form_data)
-    checkout_page.get_payment_form().fill(payment_form_data)
+    order_data = json_reader.load_test_data()
+    checkout_page.get_contact_form().fill(order_data["contact_form_data"])
+    checkout_page.get_payment_form().fill(order_data["payment_form_data"])
     confirmation_page = checkout_page.place_order()
 
     actual_errors = checkout_page.get_errors()

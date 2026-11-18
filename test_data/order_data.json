@@ -1,0 +1,18 @@
+{
+    "contact_form_data" : {
+        "first_name" : "Anna",
+        "last_name" : "Smith",
+        "email" : "anna@smith.com",
+        "phone" : "1231231233",
+        "city" : "New York",
+        "state" : "New York",
+        "address" : "Famous Street, 14",
+        "zip" : "12345"
+    },
+    "payment_form_data" : {
+        "card_name": "Main card",
+        "card_number": "4242 4242 4242 4242",
+        "expiry": "12/30",
+        "cvv": "123"
+    }
+}
