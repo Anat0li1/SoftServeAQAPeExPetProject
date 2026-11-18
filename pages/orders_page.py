@@ -18,9 +18,7 @@ class OrdersPage(BasePage):
     )
 
     def get_table(self):
-        return self.wait.until(
-            ec.visibility_of_element_located(self.ORDERS_TABLE)
-        )
+        return self.wait_until_element_visible(self.TABLE_HEADERS)
 
     def get_order_rows(self):
         return self.find_elements(self.ORDER_ROWS)

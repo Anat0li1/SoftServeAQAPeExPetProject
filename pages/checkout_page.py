@@ -4,6 +4,7 @@ from selenium.webdriver.support import expected_conditions as ec
 from pages.base_page import BasePage
 from pages.components.contact_shipping_form import ContactShippingForm
 from pages.components.payment_form import PaymentForm
+from pages.confirmation_page import ConfirmationPage
 
 
 class CheckoutPage(BasePage):
@@ -49,6 +50,7 @@ class CheckoutPage(BasePage):
     def place_order(self):
         self.click(self.ACCEPT_TERMS)
         self.click(self.PLACE_ORDER_BUTTON)
+        return ConfirmationPage(self.driver)
 
     def get_errors(self):
         return self.driver.find_elements(*self.ERROR_ELEMENTS)

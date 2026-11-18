@@ -2,6 +2,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 
 from pages.base_page import BasePage
+from pages.checkout_page import CheckoutPage
 from pages.components.order_summary import OrderSummary
 
 
@@ -18,6 +19,8 @@ class CartPage(BasePage):
 
     ORDER_SUMMARY = (By.TAG_NAME, "aside")
 
+    CHECKOUT_BUTTON = (By.XPATH, "//a[@data-testid='checkout-button']")
+
     def get_cart_items(self):
         return self.find_elements(self.CART_ITEMS)
 
@@ -31,3 +34,8 @@ class CartPage(BasePage):
         )
 
         return OrderSummary(self.driver, element)
+
+    def open_checkout(self):
+        self.click(self.CHECKOUT_BUTTON)
+        return CheckoutPage(self.driver)
+

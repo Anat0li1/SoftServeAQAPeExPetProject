@@ -17,6 +17,9 @@ class BasePage:
     def wait_until_element_visible(self, locator):
         return self.wait.until(ec.visibility_of_element_located(locator))
 
+    def wait_until_element_invisible(self, locator):
+        return self.wait.until(ec.invisibility_of_element_located(locator))
+
     def wait_until_element_clickable(self, locator):
         return self.wait.until(ec.element_to_be_clickable(locator))
 
@@ -28,7 +31,11 @@ class BasePage:
             return False
 
     def is_invisible(self, locator):
-        return not self.is_visible(locator)
+        try:
+            self.wait_until_element_invisible(locator)
+            return True
+        except TimeoutException:
+            return False
 
     def click(self, locator):
         self.wait_until_element_clickable(locator).click()

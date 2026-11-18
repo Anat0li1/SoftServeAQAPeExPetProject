@@ -3,13 +3,13 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import Select
 
 from pages.base_page import BasePage
+from pages.cart_page import CartPage
 from pages.components.product_item import ProductItem
 from pages.element import Element
+from pages.orders_page import OrdersPage
 
 
 class ProductsPage(BasePage):
-    URL = "https://www.practiceqaautomation.com/shop"
-
     CART_LINK = Element(
         (By.CSS_SELECTOR, "a[data-testid='cart-link']")
     )
@@ -55,8 +55,12 @@ class ProductsPage(BasePage):
         "//a[contains(text(), '{0}')]//ancestor::li"
     )
 
-    def open_page(self):
-        self.open(self.URL)
+    GREETINGS_TEXT = Element(
+        (By.CSS_SELECTOR, "span[data-testid='user-greeting']")
+    )
+
+    def get_greetings_text(self):
+        return self.GREETINGS_TEXT.text
 
     def get_product(self, product_name):
         locator = (
@@ -93,9 +97,12 @@ class ProductsPage(BasePage):
 
     def open_cart(self):
         self.CART_LINK.click()
+        return CartPage(self.driver)
 
     def open_orders(self):
         self.ORDERS_LINK.click()
+        return OrdersPage(self.driver)
 
     def open_products(self):
         self.NAV_PRODUCTS.click()
+        return self

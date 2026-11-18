@@ -1,6 +1,7 @@
 from selenium.webdriver.common.by import By
 
 from pages.components.base_component import BaseComponent
+from pages.orders_page import OrdersPage
 
 
 class OrderSuccess(BaseComponent):
@@ -54,3 +55,4 @@ class OrderSuccess(BaseComponent):
 
     def open_orders(self):
         self.click(self.VIEW_ORDERS_BUTTON)
+        return OrdersPage(self.driver)
