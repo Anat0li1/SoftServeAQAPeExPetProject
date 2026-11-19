@@ -1,23 +1,15 @@
 from pages.login_page import LoginPage
 from utils.price_utils import PriceUtils
 
-TEST_USERNAME = 'demo_user'
-TEST_PASSWORD = 'Demo@123'
 
-SORT_BY_VALUE = "price-asc"
-PRICE_STYLE = "american"
-
-BASE_URL = "https://www.practiceqaautomation.com/shop"
-
-
-def test_sorting_products_by_price(driver):
-    driver.get(BASE_URL)
+def test_sorting_products_by_price(driver, config):
+    driver.get(config.BASE_URL)
 
     login_page = LoginPage(driver)
-    price_utils = PriceUtils(PRICE_STYLE)
-    products_page = login_page.login(TEST_USERNAME, TEST_PASSWORD)
+    price_utils = PriceUtils(config.PRICE_STYLE)
+    products_page = login_page.login(config.TEST_USERNAME, config.TEST_PASSWORD)
 
-    products_page.sort_products(SORT_BY_VALUE)
+    products_page.sort_products(config.SORT_BY_VALUE)
 
     sorted_prices = products_page.get_product_prices()
 

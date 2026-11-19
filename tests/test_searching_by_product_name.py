@@ -2,32 +2,30 @@ import pytest
 
 from pages.login_page import LoginPage
 
-TEST_USERNAME = 'demo_user'
-TEST_PASSWORD = 'Demo@123'
-TOTAL_COUNT = 12
-COUNT_AFTER_SEARCH = 1
-SEARCH_WORD = "headphones"
-ANOTHER_SEARCH_WORD = "ni"
-ANOTHER_COUNT_AFTER_SEARCH = 4
-BASE_URL = "https://www.practiceqaautomation.com/shop"
-EXPECTED_SHOW_TEXT = "Showing {0} of {1} products"
 
-@pytest.mark.parametrize("goods_name, expected_count", [
-    (SEARCH_WORD, COUNT_AFTER_SEARCH),
-    (ANOTHER_SEARCH_WORD, ANOTHER_COUNT_AFTER_SEARCH)
-])
-def test_searching_by_product_name(driver, goods_name, expected_count):
-    driver.get(BASE_URL)
+@pytest.mark.parametrize("search_case", ["headphones", "ni"])
+def test_searching_by_product_name(driver, config, search_case):
+    search_data = {
+        "headphones": (config.SEARCH_WORD,
+                       config.COUNT_AFTER_SEARCH),
+        "ni": (config.ANOTHER_SEARCH_WORD,
+               config.ANOTHER_COUNT_AFTER_SEARCH),
+    }
+    goods_name, expected_count = search_data[search_case]
+    driver.get(config.BASE_URL)
 
     login_page = LoginPage(driver)
 
-    products_page = login_page.login(TEST_USERNAME, TEST_PASSWORD)
+    products_page = login_page.login(config.TEST_USERNAME,
+                                     config.TEST_PASSWORD)
     start_count = products_page.get_products_count()
-    assert start_count == TOTAL_COUNT, \
-        f"Expected {TOTAL_COUNT} items, got {start_count}"
+    assert start_count == config.EXPECTED_TOTAL_COUNT, \
+        f"Expected {config.EXPECTED_TOTAL_COUNT} items, got {start_count}"
     showing_text = products_page.get_product_count_text()
-    expected_start_show_text = EXPECTED_SHOW_TEXT.format(TOTAL_COUNT,
-                                                         TOTAL_COUNT)
+    expected_start_show_text = config.EXPECTED_SHOW_TEXT.format(
+        config.EXPECTED_TOTAL_COUNT,
+        config.EXPECTED_TOTAL_COUNT
+    )
     assert showing_text == expected_start_show_text, \
         f"Expected {expected_start_show_text}, got {showing_text}"
 
@@ -45,7 +43,9 @@ def test_searching_by_product_name(driver, goods_name, expected_count):
     assert finish_count == expected_count, \
         f"Expected {expected_count} items, got {finish_count}"
     showing_text = products_page.get_product_count_text()
-    expected_finish_show_text = EXPECTED_SHOW_TEXT.format(expected_count,
-                                                          TOTAL_COUNT)
+    expected_finish_show_text = config.EXPECTED_SHOW_TEXT.format(
+        expected_count,
+        config.EXPECTED_TOTAL_COUNT
+    )
     assert showing_text == expected_finish_show_text, \
         f"Expected {expected_finish_show_text}, got {showing_text}"
