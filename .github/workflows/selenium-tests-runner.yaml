@@ -50,7 +50,7 @@ jobs:
         run: |
           mkdir -p reports
 
-          pytest -v \
+          pytest tests/ -v \
             --browser="$BROWSER" \
             --headless \
             --html=reports/report.html \
