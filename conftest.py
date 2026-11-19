@@ -1,8 +1,13 @@
+import os
+from pathlib import Path
 
 import pytest
+import pytest_html
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
+
+from utils.config_loader import ConfigLoader
 
 
 def pytest_addoption(parser):
@@ -52,3 +57,32 @@ def driver(request):
     browser_driver.maximize_window()
     yield browser_driver
     browser_driver.quit()
+
+@pytest.fixture(scope="function")
+def config():
+    project_root = Path(__file__).resolve().parent
+    config_path = project_root / "config" / "automation.conf"
+    return ConfigLoader(config_path)
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    report = outcome.get_result()
+
+    if report.when == "call" and report.failed:
+        driver = item.funcargs.get("driver")
+
+        if driver:
+            os.makedirs("reports/screenshots", exist_ok=True)
+
+            screenshot_path = (
+                f"reports/screenshots/{item.name}.png"
+            )
+
+            driver.save_screenshot(screenshot_path)
+
+            extra = getattr(report, "extras", [])
+            extra.append(
+                pytest_html.extras.image(screenshot_path)
+            )
+            report.extras = extra
