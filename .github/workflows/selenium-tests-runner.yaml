@@ -3,9 +3,20 @@ name: Selenium UI Tests
 on:
   push:
     branches: [main]
+
   pull_request:
     branches: [main]
+
   workflow_dispatch:
+    inputs:
+      browser:
+        description: 'Select browser for tests'
+        required: true
+        default: chrome
+        type: choice
+        options:
+          - chrome
+          - firefox
 
 jobs:
   tests:
@@ -21,23 +32,29 @@ jobs:
           python-version: '3.13'
 
       - name: Install Chrome
+        if: github.event.inputs.browser == 'chrome' || github.event_name != 'workflow_dispatch'
         uses: browser-actions/setup-chrome@v1
+
+      - name: Install Firefox
+        if: github.event.inputs.browser == 'firefox'
+        uses: browser-actions/setup-firefox@v1
 
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y xvfb openbox
-
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run tests
+        env:
+          BROWSER: ${{ github.event.inputs.browser || 'chrome' }}
         run: |
           mkdir -p reports
 
-          xvfb-run --auto-servernum \
-            --server-args="-screen 0 1920x1080x24" \
-            sh -c "openbox & sleep 2; pytest -v --html=reports/report.html --self-contained-html"
+          pytest tests/ -v \
+            --browser="$BROWSER" \
+            --headless \
+            --html=reports/report.html \
+            --self-contained-html
 
       - name: Upload test report
         uses: actions/upload-artifact@v4

@@ -1,0 +1,16 @@
+[tool.ruff]
+line-length = 79
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "E",  # Errors
+    "W",  # Warnings
+    "F",  # Pyflakes
+    "I",  # Imports
+    "N",  # Namings
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
